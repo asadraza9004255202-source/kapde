@@ -40,11 +40,17 @@ app.use(cookieParser());
 
 // The frontend asks for this so the Client ID is never hard-coded in the HTML
 app.get('/api/config', (req, res) => res.json({ googleClientId: GOOGLE_CLIENT_ID || null }));
+
+// Serve the main website homepage on root URL so it fixes "Cannot GET /"
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api', (req, res) => res.status(404).json({ error: 'Not found.' }));
 
-// Serve the website itself from the same server (no CORS needed)
-app.use(express.static(path.join(__dirname, '..', 'client')));
+// Serve the website static files from the same server
+app.use(express.static(path.join(__dirname)));
 
 app.use((err, req, res, next) => {
   console.error(err);
